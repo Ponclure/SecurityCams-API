@@ -1,0 +1,6 @@
+name: Camera
+main: com.github.security.SecurityCams
+version: 1.0.0
+description: Security Cams in Minecraft
+author: PulseBeat_02
+api-version: 1.16
