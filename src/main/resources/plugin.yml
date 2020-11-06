@@ -1,6 +1,13 @@
+depend: [Citizens]
 name: Camera
 main: com.github.security.SecurityCams
 version: 1.0.0
 description: Security Cams in Minecraft
 author: PulseBeat_02
 api-version: 1.16
+commands:
+ usecamera:
+   description: Use the Camera with the Specified Name
+ setcamera:
+   description: Create a Camera with the Specified Name
+  

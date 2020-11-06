@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
@@ -11,8 +12,8 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import com.github.security.SecurityCams;
 
 public class CameraMovement implements Listener {
-	
-	@EventHandler
+
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onMove(PlayerMoveEvent event) {
 		UUID uuid = event.getPlayer().getUniqueId();
 		if (!SecurityCams.npcs.containsKey(uuid)) {
@@ -20,8 +21,8 @@ public class CameraMovement implements Listener {
 		}
 		event.setCancelled(true);
 	}
-	
-	@EventHandler
+
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerToggleSneakEvent(PlayerToggleSneakEvent event) {
 		Player p = event.getPlayer();
 		UUID uuid = p.getUniqueId();
@@ -30,7 +31,6 @@ public class CameraMovement implements Listener {
 		}
 		p.teleport(SecurityCams.getNPCs().get(uuid).getStoredLocation());
 		SecurityCams.npcs.remove(uuid);
-		
 	}
 
 }
