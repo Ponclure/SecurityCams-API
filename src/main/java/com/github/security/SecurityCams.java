@@ -1,37 +1,52 @@
 package com.github.security;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.github.security.camera.Camera;
+import com.github.security.command.CameraDeletion;
 import com.github.security.command.CameraNPCHandler;
 import com.github.security.command.CameraPlacement;
-import com.github.security.event.CameraMovement;
+import com.github.security.event.build.CameraMovement;
+import com.github.security.event.build.PlayerConserver;
 
-import net.citizensnpcs.api.npc.NPC;
 import net.md_5.bungee.api.ChatColor;
 
 public class SecurityCams extends JavaPlugin {
 
-	public static Map<UUID, NPC> npcs = new HashMap<>();
-	public static Set<Camera> cameras = new HashSet<>();
+	public static FileConfiguration config;
 
-	private static Logger logger = Bukkit.getLogger();
-	private static SecurityCams security;
+	public static SecurityCams security;
+	public static Logger logger;
 
 	@Override
 	public void onEnable() {
 		security = this;
+		logger = Bukkit.getLogger();
+		config = SecurityCams.getPlugin().getConfig();
 		logger.info(ChatColor.GREEN + "Security Cams API is Loading Up");
+
+		if (config.get("enable-api-commands") == null) {
+			config.addDefault("enable-api-commands", true);
+			config.options().copyDefaults(true);
+			saveConfig();
+		} else {
+			boolean status = (boolean)config.get("enable-api-commands");
+			if (!status) {
+				getServer().getPluginManager().disablePlugin(this);
+			}
+		}
+
 		Bukkit.getPluginCommand("usecamera").setExecutor(new CameraNPCHandler());
 		Bukkit.getPluginCommand("setcamera").setExecutor(new CameraPlacement());
+		Bukkit.getPluginCommand("deletecamera").setExecutor(new CameraDeletion());
+		
 		getServer().getPluginManager().registerEvents(new CameraMovement(), this);
+		getServer().getPluginManager().registerEvents(new PlayerConserver(), this);
 	}
 
 	@Override
@@ -44,11 +59,7 @@ public class SecurityCams extends JavaPlugin {
 	}
 
 	public static Set<Camera> getCameras() {
-		return cameras;
-	}
-
-	public static Map<UUID, NPC> getNPCs() {
-		return npcs;
+		return CameraMap.cameras;
 	}
 
 }

@@ -10,4 +10,6 @@ commands:
    description: Use the Camera with the Specified Name
  setcamera:
    description: Create a Camera with the Specified Name
+ deletecamera:
+   description: Delete a Camera with the Specified Name
   

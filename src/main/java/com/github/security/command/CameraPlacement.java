@@ -1,5 +1,6 @@
 package com.github.security.command;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -7,12 +8,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.github.security.Camera;
-import com.github.security.SecurityCams;
+import com.github.security.event.CameraSetEvent;
 import com.github.security.utility.SkullCreation;
 
 import net.md_5.bungee.api.ChatColor;
 
+//TESTING PURPOSES
 public class CameraPlacement implements CommandExecutor {
 
 	@Override
@@ -27,21 +28,21 @@ public class CameraPlacement implements CommandExecutor {
 		}
 
 		Player p = (Player) sender;
+		Location loc;
 		if (args.length == 1) {
-			SecurityCams.getCameras().add(new Camera(p, args[0]));
+			loc = p.getLocation();
 		} else if (args.length == 4) {
-			SecurityCams.getCameras().add(new Camera(p, new Location(p.getWorld(), Double.parseDouble(args[2]),
-					Double.parseDouble(args[3]), Double.parseDouble(args[4])), args[0]));
+			loc = new Location(p.getWorld(), Double.parseDouble(args[1]), Double.parseDouble(args[2]),
+					Double.parseDouble(args[3]));
 		} else if (args.length == 6) {
-			SecurityCams.getCameras()
-					.add(new Camera(p,
-							new Location(p.getWorld(), Double.parseDouble(args[2]), Double.parseDouble(args[3]),
-									Double.parseDouble(args[4]), Float.parseFloat(args[5]), Float.parseFloat(args[6])),
-							args[0]));
+			loc = new Location(p.getWorld(), Double.parseDouble(args[1]), Double.parseDouble(args[2]),
+					Double.parseDouble(args[3]), Float.parseFloat(args[4]), Float.parseFloat(args[5]));
 		} else {
 			p.sendMessage(ChatColor.RED + "Wrong usage for /setcamera");
 			return false;
 		}
+		
+		Bukkit.getPluginManager().callEvent(new CameraSetEvent(p, args[0], loc));
 
 		return true;
 	}
