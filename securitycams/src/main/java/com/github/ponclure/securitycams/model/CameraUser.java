@@ -68,7 +68,7 @@ public class CameraUser {
 			npc.setSkin(skin);
 			npc.create();
 			Bukkit.getScheduler().runTask(npcFramework.getPlugin(), () -> {
-				Bukkit.getOnlinePlayers().forEach(p -> npc.show(p, true));
+				Bukkit.getOnlinePlayers().forEach(npc::show);
 			});
 		});
 	}
