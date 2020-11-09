@@ -1,5 +1,5 @@
 name: CamerasTest
-main: com.github.ponclure.security.CamerasSandbox
+main: com.github.ponclure.securitycams.CamerasSandbox
 version: ${project.version}
 description: Security Cams in Minecraft
 author: Ponclure
