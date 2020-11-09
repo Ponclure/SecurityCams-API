@@ -22,6 +22,7 @@ import com.github.ponclure.securitycams.commands.DestroyCameraCommand;
 import com.github.ponclure.securitycams.commands.UseCameraCommand;
 import com.github.ponclure.securitycams.commands.SetCameraCommand;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -47,7 +48,7 @@ public class CamerasSandbox extends JavaPlugin {
 		try {
 			cameraManager = new CameraManager(this, new File(getDataFolder(), "cameras.yml"));
 		}
-		catch (IOException e) {
+		catch (IOException | InvalidConfigurationException e) {
 			throw new RuntimeException(e);
 		}
 
