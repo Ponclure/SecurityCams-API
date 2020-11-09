@@ -43,7 +43,6 @@ public class CamerasSandbox extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		getLogger().info(ChatColor.GREEN + "Security Cams API is Loading Up");
-		saveDefaultConfig();
 
 		try {
 			cameraManager = new CameraManager(this, new File(getDataFolder(), "cameras.yml"));
