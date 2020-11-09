@@ -18,7 +18,6 @@
 
 package com.github.ponclure.securitycams.model;
 
-import com.github.ponclure.securitycams.util.ReflectionUtil;
 import com.github.ponclure.securitycams.util.SkullCreation;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
@@ -29,7 +28,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
-import java.lang.reflect.Field;
 import java.util.UUID;
 
 import static java.lang.Math.toRadians;
@@ -38,35 +36,41 @@ public class Camera {
 
 	private static final ItemStack CAMERA_HEAD = SkullCreation.itemWithBase64(SkullCreation.createSkull(), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2RiODM1ODY1NDI5MzRmOGMzMjMxYTUyODRmMjQ4OWI4NzY3ODQ3ODQ1NGZjYTY5MzU5NDQ3NTY5ZjE1N2QxNCJ9fX0=");
 	private static final Vector TWO = new Vector(2, 2, 2);
-	private static float ARMOR_STAND_HEIGHT;
-
-	static {
-		try {
-			ARMOR_STAND_HEIGHT = Float.NEGATIVE_INFINITY;
-			final Class<?> entityTypesClass = ReflectionUtil.nmsClass("EntityTypes");
-			final Field armorStandStaticField = entityTypesClass.getDeclaredField("ARMOR_STAND");
-			final Field heightField = ReflectionUtil.nmsDeclaredField("EntitySize", "height");
-
-			final Field[] entityTypesFields = entityTypesClass.getDeclaredFields();
-			for (final Field field : entityTypesFields) {
-				if (field.getType().getSimpleName().equalsIgnoreCase("EntitySize")) {
-					field.setAccessible(true);
-					ARMOR_STAND_HEIGHT = heightField.getFloat(field.get(armorStandStaticField.get(null)));
-					break;
-				}
-			}
-		}
-		catch (ReflectiveOperationException exception) {
-			throw new RuntimeException(exception);
-		}
-	}
 
 	public static Camera create(final Location location, final String name) {
-		return new Camera(location, name);
+		return new Camera(location, name, getStandModel(location).getUniqueId());
 	}
 
 	public static Camera createVirtual(final Location location, final String name, final UUID uuid) {
 		return new Camera(location, name, uuid);
+	}
+
+	@SuppressWarnings("ConstantConditions")
+	private static ArmorStand getStandModel(final Location location) {
+		return location.getWorld().spawn(location, ArmorStand.class, armorStand -> {
+			armorStand.setGravity(false);
+			armorStand.setArms(false);
+			armorStand.setVisible(false);
+			armorStand.setBasePlate(false);
+			armorStand.setPersistent(true);
+			armorStand.setInvulnerable(true);
+			armorStand.setCustomNameVisible(true);
+			armorStand.setCustomName("Security Camera");
+			armorStand.getEquipment().setHelmet(CAMERA_HEAD);
+
+			armorStand.setBodyPose(EulerAngle.ZERO);
+			armorStand.setHeadPose(new EulerAngle(toRadians(location.getPitch()), 0, 0));
+			armorStand.setLeftArmPose(EulerAngle.ZERO);
+			armorStand.setLeftLegPose(EulerAngle.ZERO);
+			armorStand.setRightArmPose(EulerAngle.ZERO);
+			armorStand.setRightLegPose(EulerAngle.ZERO);
+
+			for (final EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
+				for (final ArmorStand.LockType lockType : ArmorStand.LockType.values()) {
+					armorStand.addEquipmentLock(equipmentSlot, lockType);
+				}
+			}
+		});
 	}
 
 	private final Location actualLocation;
@@ -75,22 +79,12 @@ public class Camera {
 	private final String name;
 
 	private Camera(final Location location, final String name, final UUID uuid) {
-		this.actualLocation = location.clone();
 		this.armorStandUuid = uuid;
 		this.name = name;
 
+		this.actualLocation = location.clone();
 		this.bakedViewpoint = actualLocation.clone();
-		this.bakedViewpoint.add(0, ARMOR_STAND_HEIGHT, 0);
-	}
-
-	private Camera(final Location location, final String name) {
-		final ArmorStand armorStand = getStandModel(location);
-		this.name = name;
-		armorStandUuid = armorStand.getUniqueId();
-
-		actualLocation = location.clone();
-		final Location eyeLocation = armorStand.getEyeLocation();
-		bakedViewpoint = eyeLocation.add(eyeLocation.getDirection().normalize().divide(TWO));
+		this.bakedViewpoint.add(bakedViewpoint.getDirection().normalize().divide(TWO));
 	}
 
 	public Location getViewpoint() {
@@ -106,36 +100,6 @@ public class Camera {
 			final ArmorStand armorStand = (ArmorStand)Bukkit.getEntity(armorStandUuid);
 			if (armorStand != null) {
 				armorStand.remove();
-			}
-		});
-	}
-
-	@SuppressWarnings("ConstantConditions")
-	public ArmorStand getStandModel(final Location location) {
-		return location.getWorld().spawn(location, ArmorStand.class, armorStand -> {
-			armorStand.setGravity(false);
-			armorStand.setArms(false);
-			armorStand.setVisible(false);
-			armorStand.setBasePlate(false);
-			armorStand.setPersistent(true);
-			armorStand.setInvulnerable(true);
-			armorStand.setCustomNameVisible(true);
-			armorStand.setCustomName("Security Camera");
-			armorStand.getEquipment().setHelmet(CAMERA_HEAD);
-			// stupid bukkit
-			armorStand.getLocation().setDirection(location.getDirection());
-
-			armorStand.setBodyPose(EulerAngle.ZERO);
-			armorStand.setHeadPose(new EulerAngle(toRadians(location.getPitch()), 0, 0));
-			armorStand.setLeftArmPose(EulerAngle.ZERO);
-			armorStand.setLeftLegPose(EulerAngle.ZERO);
-			armorStand.setRightArmPose(EulerAngle.ZERO);
-			armorStand.setRightLegPose(EulerAngle.ZERO);
-
-			for (final EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
-				for (final ArmorStand.LockType lockType : ArmorStand.LockType.values()) {
-					armorStand.addEquipmentLock(equipmentSlot, lockType);
-				}
 			}
 		});
 	}
