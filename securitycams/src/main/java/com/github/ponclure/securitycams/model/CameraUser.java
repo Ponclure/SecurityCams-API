@@ -35,7 +35,7 @@ import java.util.Collections;
 
 public class CameraUser {
 
-	private NPC npc;
+	private NPCBase npc;
 	private final Player player;
 	private final Camera camera;
 	private final Location previousLocation;
@@ -47,17 +47,16 @@ public class CameraUser {
 		this.previousLocation = player.getLocation();
 		this.previousGamemode = player.getGameMode();
 
-		player.setGameMode(GameMode.SPECTATOR);
 		PaperLib.teleportAsync(player, camera.getViewpoint(), PlayerTeleportEvent.TeleportCause.SPECTATE).thenRun(() -> {
-			npc = replacePlayer(player, previousLocation, npcFramework);
+			replacePlayer(player, previousLocation, npcFramework);
 			player.setGameMode(GameMode.SPECTATOR);
 		});
 	}
 
-	private NPC replacePlayer(final Player player, final Location oldLocation, final SimpleNPCFramework npcFramework) {
+	private void replacePlayer(final Player player, final Location oldLocation, final SimpleNPCFramework npcFramework) {
 		final PlayerInventory inv = player.getInventory();
 
-		final NPCBase npc = (NPCBase)npcFramework.createNPC(Collections.singletonList(player.getName()));
+		npc = (NPCBase)npcFramework.createNPC(Collections.singletonList(player.getName()));
 		npc.setItem(NPCSlot.HELMET, inv.getHelmet());
 		npc.setItem(NPCSlot.CHESTPLATE, inv.getChestplate());
 		npc.setItem(NPCSlot.LEGGINGS, inv.getLeggings());
@@ -65,11 +64,13 @@ public class CameraUser {
 		npc.setItem(NPCSlot.MAINHAND, inv.getItemInMainHand());
 		npc.setItem(NPCSlot.OFFHAND, inv.getItemInOffHand());
 		npc.setLocation(oldLocation);
-		AsyncSkinFetcher.fetchSkinFromUuidAsync(player.getUniqueId(), npc::setSkin);
-		npc.create();
-		Bukkit.getOnlinePlayers().forEach(p -> npc.show(p, true));
-
-		return npc;
+		AsyncSkinFetcher.fetchSkinFromUuidAsync(player.getUniqueId(), skin -> {
+			npc.setSkin(skin);
+			npc.create();
+			Bukkit.getScheduler().runTask(npcFramework.getPlugin(), () -> {
+				Bukkit.getOnlinePlayers().forEach(p -> npc.show(p, true));
+			});
+		});
 	}
 
 	public void returnBack() {

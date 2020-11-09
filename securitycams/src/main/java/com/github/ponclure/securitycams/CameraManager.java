@@ -107,6 +107,7 @@ public final class CameraManager {
 		final CameraExitEvent event = new CameraExitEvent(player, user);
 		Bukkit.getPluginManager().callEvent(event);
 		if (!event.isCancelled() || force) {
+			user.returnBack();
 			watchers.remove(player.getUniqueId());
 		}
 		return !event.isCancelled();

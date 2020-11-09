@@ -57,6 +57,7 @@ public class CamerasSandbox extends JavaPlugin {
 	}
 
 	public List<String> filterNames(final String base) {
+		criteria.setBase(base);
 		return cameraManager.getCameraNames().stream().filter(criteria).collect(Collectors.toList());
 	}
 

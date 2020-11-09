@@ -32,6 +32,8 @@ import org.bukkit.util.Vector;
 import java.lang.reflect.Field;
 import java.util.UUID;
 
+import static java.lang.Math.toRadians;
+
 public class Camera {
 
 	private static final ItemStack CAMERA_HEAD = SkullCreation.itemWithBase64(SkullCreation.createSkull(), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2RiODM1ODY1NDI5MzRmOGMzMjMxYTUyODRmMjQ4OWI4NzY3ODQ3ODQ1NGZjYTY5MzU5NDQ3NTY5ZjE1N2QxNCJ9fX0=");
@@ -48,11 +50,13 @@ public class Camera {
 			final Field[] entityTypesFields = entityTypesClass.getDeclaredFields();
 			for (final Field field : entityTypesFields) {
 				if (field.getType().getSimpleName().equalsIgnoreCase("EntitySize")) {
+					field.setAccessible(true);
 					ARMOR_STAND_HEIGHT = heightField.getFloat(field.get(armorStandStaticField.get(null)));
 					break;
 				}
 			}
-		} catch (ReflectiveOperationException exception) {
+		}
+		catch (ReflectiveOperationException exception) {
 			throw new RuntimeException(exception);
 		}
 	}
@@ -107,20 +111,22 @@ public class Camera {
 	}
 
 	@SuppressWarnings("ConstantConditions")
-	public ArmorStand getStandModel(final Location loc) {
-		return loc.getWorld().spawn(loc, ArmorStand.class, armorStand -> {
+	public ArmorStand getStandModel(final Location location) {
+		return location.getWorld().spawn(location, ArmorStand.class, armorStand -> {
 			armorStand.setGravity(false);
-			armorStand.setMarker(true);
 			armorStand.setArms(false);
 			armorStand.setVisible(false);
 			armorStand.setBasePlate(false);
 			armorStand.setPersistent(true);
+			armorStand.setInvulnerable(true);
 			armorStand.setCustomNameVisible(true);
 			armorStand.setCustomName("Security Camera");
 			armorStand.getEquipment().setHelmet(CAMERA_HEAD);
+			// stupid bukkit
+			armorStand.getLocation().setDirection(location.getDirection());
 
 			armorStand.setBodyPose(EulerAngle.ZERO);
-			armorStand.setHeadPose(EulerAngle.ZERO);
+			armorStand.setHeadPose(new EulerAngle(toRadians(location.getPitch()), 0, 0));
 			armorStand.setLeftArmPose(EulerAngle.ZERO);
 			armorStand.setLeftLegPose(EulerAngle.ZERO);
 			armorStand.setRightArmPose(EulerAngle.ZERO);
