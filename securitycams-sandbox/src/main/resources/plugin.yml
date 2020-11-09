@@ -1,0 +1,16 @@
+name: CamerasTest
+main: com.github.ponclure.security.CamerasSandbox
+version: ${project.version}
+description: Security Cams in Minecraft
+author: Ponclure
+api-version: 1.16
+
+depend: [ Citizens ]
+
+commands:
+  usecamera:
+    description: Use the Camera with the Specified Name
+  setcamera:
+    description: Create a Camera with the Specified Name
+  deletecamera:
+    description: Delete a Camera with the Specified Name
