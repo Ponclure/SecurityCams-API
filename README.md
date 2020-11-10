@@ -20,5 +20,7 @@ Camera load is also loaded asynchronously, and will be cached on Camera Manager 
 
 To *use* a camera, you would use the `CameraManager#addWatcher(Player player, Camera camera)` to add a watcher to a camera. Cameras by default support multiple watchers at once. In order to  remove a watcher from a Camera, use the `CameraManager#removeWatcher(Player player, boolean forceRemove)` method which will either force remove or normally remove a player from a camera view. By default, sneaking will let the player out of the Camera, and teleport the player to it's original location. 
 
+In addition from methods, there are also events as well such as the `CameraSetEvent`, `CameraDestroyEvent`, `CameraEnterEvent`, and `CameraExitEvent`.
+
 ## Conclusion
 And that's pretty much it. We will be adding more features as we go on, but check out our organization's website located at [https://ponclure.github.io](https://ponclure.github.io), which contains all of our projects and source code made by collaborative developers. I hope this API is useful!
