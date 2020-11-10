@@ -34,55 +34,57 @@ import java.util.List;
 
 public class UseCameraCommand implements TabExecutor {
 
-	private final CamerasSandbox plugin;
-	private final CameraManager cameraManager;
+    private final CamerasSandbox plugin;
+    private final CameraManager cameraManager;
 
-	public UseCameraCommand(final CamerasSandbox plugin, final PluginCommand command) {
-		if (command == null) {
-			throw new RuntimeException();
-		}
-
-		command.setExecutor(this);
-		command.setTabCompleter(this);
-		this.plugin = plugin;
-		this.cameraManager = plugin.getCameraManager();
+    public UseCameraCommand(final CamerasSandbox plugin, final PluginCommand command) {
+	if (command == null) {
+	    throw new RuntimeException();
 	}
 
-	@Override
-	public boolean onCommand(@NotNull final CommandSender sender, @NotNull final Command command, @NotNull final String label, @NotNull final String[] args) {
-		if (!(sender instanceof Player)) {
-			sender.sendMessage("Only players can run this command!");
-			return true;
-		}
+	command.setExecutor(this);
+	command.setTabCompleter(this);
+	this.plugin = plugin;
+	this.cameraManager = plugin.getCameraManager();
+    }
 
-		if (!sender.isOp()) {
-			sender.sendMessage("You do not have sufficient permissions!");
-			return true;
-		}
-
-		if (args.length != 1) {
-			sender.sendMessage("Usage: /usecamera <camera>");
-			return true;
-		}
-
-		final Player player = (Player)sender;
-		final Camera camera = cameraManager.getCamera(args[0]);
-
-		if (camera == null) {
-			sender.sendMessage(ChatColor.DARK_RED + "The camera name is not valid");
-			return false;
-		}
-
-		cameraManager.addWatcher(player, camera);
-		return true;
+    @Override
+    public boolean onCommand(@NotNull final CommandSender sender, @NotNull final Command command,
+	    @NotNull final String label, @NotNull final String[] args) {
+	if (!(sender instanceof Player)) {
+	    sender.sendMessage("Only players can run this command!");
+	    return true;
 	}
 
-	@Override
-	public @NotNull List<String> onTabComplete(@NotNull final CommandSender sender, @NotNull final Command command, @NotNull final String alias, @NotNull final String[] args) {
-		if (args.length != 1) {
-			return Collections.emptyList();
-		}
-
-		return plugin.filterNames(args[0]);
+	if (!sender.isOp()) {
+	    sender.sendMessage("You do not have sufficient permissions!");
+	    return true;
 	}
+
+	if (args.length != 1) {
+	    sender.sendMessage("Usage: /usecamera <camera>");
+	    return true;
+	}
+
+	final Player player = (Player) sender;
+	final Camera camera = cameraManager.getCamera(args[0]);
+
+	if (camera == null) {
+	    sender.sendMessage(ChatColor.DARK_RED + "The camera name is not valid");
+	    return false;
+	}
+
+	cameraManager.addWatcher(player, camera);
+	return true;
+    }
+
+    @Override
+    public @NotNull List<String> onTabComplete(@NotNull final CommandSender sender, @NotNull final Command command,
+	    @NotNull final String alias, @NotNull final String[] args) {
+	if (args.length != 1) {
+	    return Collections.emptyList();
+	}
+
+	return plugin.filterNames(args[0]);
+    }
 }
