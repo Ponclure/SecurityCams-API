@@ -19,8 +19,6 @@
 package com.github.ponclure.securitycams.listeners;
 
 import com.github.ponclure.securitycams.CameraManager;
-import com.github.ponclure.securitycams.model.CameraUser;
-import com.github.ponclure.securitycams.event.CameraExitEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

@@ -6,9 +6,12 @@ author: Ponclure
 api-version: 1.16
 
 commands:
-  usecamera:
-    description: Use the Camera with the Specified Name
   setcamera:
-    description: Create a Camera with the Specified Name
+    description: Create a camera with the specified name
+    usage: /setcamera [camera-name]
+  usecamera:
+    description: Use the camera with the specified name
+    usage: /usecamera [camera-name]
   deletecamera:
-    description: Delete a Camera with the Specified Name
+    description: Delete a camera with the specified name
+    usage: /deletecamera [camera-name]

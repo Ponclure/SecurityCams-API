@@ -44,19 +44,26 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 public final class CameraManager {
 
 	private final Plugin plugin;
 	private final SimpleNPCFramework npcFramework;
 
-	private final File knownCamerasFile;
+	private File knownCamerasFile;
+	public final static Executor async = ForkJoinPool.commonPool();
 	private final YamlConfiguration knownCamerasYaml = new YamlConfiguration();
+	
+	
 	private final Set<UUID> knownCameras = new LinkedHashSet<>();
-
 	private final Map<String, Camera> cameras = new LinkedHashMap<>();
 	private final Map<UUID, CameraUser> watchers = new LinkedHashMap<>();
-
+	
 	public CameraManager(final JavaPlugin plugin, final File index) throws InvalidConfigurationException, IOException {
 		this.plugin = plugin;
 		this.npcFramework = new SimpleNPCFramework(plugin);
@@ -73,8 +80,45 @@ public final class CameraManager {
 
 	// TODO: load/save armor stands UUIDs and their locations into the index file, that would be done asynchronously with a lock.
 	// load would cache on camera manager creation, save would trigger on each camera addition/deletion.
-	private void loadCameras() {
 
+	private final WriteLock lock = new ReentrantReadWriteLock().writeLock();
+	private void addCamera(Camera added) {
+		String uuid = added.getUUID().toString();
+		CompletableFuture.runAsync(() -> {
+			try {
+				lock.lock();
+				knownCamerasYaml.createSection(uuid);
+				knownCamerasYaml.set(uuid + ".name", added.getName());
+				knownCamerasYaml.set(uuid + ".location", added.getActualLocation());
+				saveConfiguration();
+			} finally {
+				lock.unlock();
+			}
+			return;
+		}, CameraManager.async);
+	}
+	private void deleteCamera(Camera deleted) {
+		String uuid = deleted.getUUID().toString();
+		CompletableFuture.runAsync(() -> {
+			try {
+				lock.lock();
+				knownCamerasYaml.set(uuid, null);
+				saveConfiguration();
+			} finally {
+				lock.unlock();
+			}
+			return;
+		}, CameraManager.async);
+	}
+	public void saveConfiguration() {
+		try {
+			knownCamerasYaml.save(knownCamerasFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void loadCameras() {
 	}
 
 	public void addWatcher(final Player player, final Camera camera) {
@@ -154,4 +198,17 @@ public final class CameraManager {
 		}
 		return !event.isCancelled();
 	}
+
+	public File getKnownCamerasFile() {
+		return knownCamerasFile;
+	}
+	
+	public YamlConfiguration getConfiguration() {
+		return knownCamerasYaml;
+	}
+
+	public Plugin getPlugin() {
+		return plugin;
+	}
+
 }

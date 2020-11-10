@@ -45,7 +45,6 @@ public class Camera {
 		return new Camera(location, name, uuid);
 	}
 
-	@SuppressWarnings("ConstantConditions")
 	private static ArmorStand getStandModel(final Location location) {
 		return location.getWorld().spawn(location, ArmorStand.class, armorStand -> {
 			armorStand.setGravity(false);
@@ -86,15 +85,23 @@ public class Camera {
 		this.bakedViewpoint = actualLocation.clone();
 		this.bakedViewpoint.add(bakedViewpoint.getDirection().normalize().divide(TWO));
 	}
+	
+	public Location getActualLocation() {
+		return actualLocation;
+	}
 
 	public Location getViewpoint() {
 		return bakedViewpoint.clone();
+	}
+	
+	public UUID getUUID() {
+		return armorStandUuid;
 	}
 
 	public String getName() {
 		return name;
 	}
-
+	
 	public void destroy() {
 		PaperLib.getChunkAtAsync(actualLocation).thenAccept(chunk -> {
 			final ArmorStand armorStand = (ArmorStand)Bukkit.getEntity(armorStandUuid);
