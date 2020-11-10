@@ -14,9 +14,9 @@ The class which is needed for the API to be useful is the `CameraManager` class,
 
 Once you are done defining your `CameraManager` class, adding a camera is as convienant as `CameraManager#addCamera(Location loc, String name)` and removing a camera is as simple as `CameraManager#removeCamera(Location loc, String name)`. 
 
-When a camera is added or deleted, the `YAML` file storing the camera configurations is updated. File modifying is modified asynchronously, and uses a lock to make sure that the same file isn't being written by multiple threads, causing an `Exception` to occur. 
+Cameras are saved in the indicated file in `YAML` format, which gets updated as cameras are created and deleted asynchronously to not block the main server thread with IO operations.
 
-Camera load is also loaded asynchronously, and will be cached on Camera Manager creation. This also as well uses a lock to make sure that it isn't being read by multiple threads.
+Camera data load is also made asynchronously, and will be cached upon CameraManager creation.
 
 To *use* a camera, you would use the `CameraManager#addWatcher(Player player, Camera camera)` to add a watcher to a camera. Cameras by default support multiple watchers at once. In order to  remove a watcher from a Camera, use the `CameraManager#removeWatcher(Player player, boolean forceRemove)` method which will either force remove or normally remove a player from a camera view. By default, sneaking will let the player out of the Camera, and teleport the player to it's original location. 
 
