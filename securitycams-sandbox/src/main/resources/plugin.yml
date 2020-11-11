@@ -8,10 +8,7 @@ api-version: 1.16
 commands:
   setcamera:
     description: Create a camera with the specified name
-    usage: /setcamera [camera-name]
   usecamera:
     description: Use the camera with the specified name
-    usage: /usecamera [camera-name]
   deletecamera:
     description: Delete a camera with the specified name
-    usage: /deletecamera [camera-name]
