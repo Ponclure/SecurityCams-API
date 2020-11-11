@@ -85,15 +85,15 @@ public class Camera {
 		this.bakedViewpoint = actualLocation.clone();
 		this.bakedViewpoint.add(bakedViewpoint.getDirection().normalize().divide(TWO));
 	}
-	
+
 	public Location getActualLocation() {
-		return actualLocation;
+		return actualLocation.clone();
 	}
 
 	public Location getViewpoint() {
 		return bakedViewpoint.clone();
 	}
-	
+
 	public UUID getUUID() {
 		return armorStandUuid;
 	}
@@ -101,7 +101,7 @@ public class Camera {
 	public String getName() {
 		return name;
 	}
-	
+
 	public void destroy() {
 		PaperLib.getChunkAtAsync(actualLocation).thenAccept(chunk -> {
 			final ArmorStand armorStand = (ArmorStand)Bukkit.getEntity(armorStandUuid);

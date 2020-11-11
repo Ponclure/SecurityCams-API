@@ -32,45 +32,49 @@ import java.util.List;
 
 public class DestroyCameraCommand implements TabExecutor {
 
-    private final CamerasSandbox plugin;
-    private final CameraManager cameraManager;
+	private final CamerasSandbox plugin;
+	private final CameraManager cameraManager;
 
-    public DestroyCameraCommand(final CamerasSandbox plugin, final PluginCommand command) {
-	if (command == null) {
-	    throw new RuntimeException();
+	public DestroyCameraCommand(final CamerasSandbox plugin, final PluginCommand command) {
+		if (command == null) {
+			throw new RuntimeException();
+		}
+		command.setExecutor(this);
+		command.setTabCompleter(this);
+		this.plugin = plugin;
+		this.cameraManager = plugin.getCameraManager();
 	}
-	command.setExecutor(this);
-	command.setTabCompleter(this);
-	this.plugin = plugin;
-	this.cameraManager = plugin.getCameraManager();
-    }
 
-    @Override
-    public boolean onCommand(@NotNull final CommandSender sender, @NotNull final Command command,
-	    @NotNull final String label, @NotNull final String[] args) {
-	if (!(sender instanceof Player)) {
-	    sender.sendMessage("Only players can run this command!");
-	    return true;
-	}
-	if (!sender.isOp()) {
-	    sender.sendMessage("You do not have sufficient permissions!");
-	    return true;
-	}
-	final Player player = (Player) sender;
-	if (args.length == 1) {
-	    cameraManager.removeCamera(args[0]);
-	} else {
-	    player.sendMessage("Usage: /destroycamera <camera>");
-	}
-	return true;
-    }
+	@Override
+	public boolean onCommand(@NotNull final CommandSender sender, @NotNull final Command command, @NotNull final String label, @NotNull final String[] args) {
+		if (!(sender instanceof Player)) {
+			sender.sendMessage("Only players can run this command!");
+			return true;
+		}
 
-    @Override
-    public @NotNull List<String> onTabComplete(@NotNull final CommandSender sender, @NotNull final Command command,
-	    @NotNull final String alias, @NotNull final String[] args) {
-	if (args.length != 1) {
-	    return Collections.emptyList();
+		if (!sender.isOp()) {
+			sender.sendMessage("You do not have sufficient permissions!");
+			return true;
+		}
+
+		final Player player = (Player)sender;
+		if (args.length == 1) {
+			cameraManager.removeCamera(args[0]);
+		}
+
+		else {
+			player.sendMessage("Usage: /destroycamera <camera>");
+		}
+
+		return true;
 	}
-	return plugin.filterNames(args[0]);
-    }
+
+	@Override
+	public @NotNull List<String> onTabComplete(@NotNull final CommandSender sender, @NotNull final Command command, @NotNull final String alias, @NotNull final String[] args) {
+		if (args.length != 1) {
+			return Collections.emptyList();
+		}
+
+		return plugin.filterNames(args[0]);
+	}
 }

@@ -19,8 +19,8 @@
 package com.github.ponclure.securitycams;
 
 import com.github.ponclure.securitycams.commands.DestroyCameraCommand;
-import com.github.ponclure.securitycams.commands.UseCameraCommand;
 import com.github.ponclure.securitycams.commands.SetCameraCommand;
+import com.github.ponclure.securitycams.commands.UseCameraCommand;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -33,49 +33,49 @@ import java.util.stream.Collectors;
 
 public class CamerasSandbox extends JavaPlugin {
 
-    private final FilteringCriteria criteria = new FilteringCriteria();
-    private CameraManager cameraManager;
+	private final FilteringCriteria criteria = new FilteringCriteria();
+	private CameraManager cameraManager;
 
-    @Override
-    public void onEnable() {
-	getLogger().info(ChatColor.GREEN + "Security Cams API is Loading Up");
+	@Override
+	public void onEnable() {
+		getLogger().info(ChatColor.GREEN + "Security Cams API is Loading Up");
 
-	try {
-	    cameraManager = new CameraManager(this, new File(getDataFolder(), "cameras.yml"));
-	} catch (IOException | InvalidConfigurationException e) {
-	    throw new RuntimeException(e);
-	}
+		try {
+			cameraManager = new CameraManager(this, new File(getDataFolder(), "cameras.yml"));
+		}
+		catch (IOException | InvalidConfigurationException e) {
+			throw new RuntimeException(e);
+		}
 
-	new UseCameraCommand(this, getCommand("usecamera"));
-	new SetCameraCommand(this, getCommand("setcamera"));
-	new DestroyCameraCommand(this, getCommand("deletecamera"));
-    }
-
-    @Override
-    public void onDisable() {
-	getLogger().info(ChatColor.GREEN + "Security Cams API is Shutting Down");
-    }
-    
-    public CameraManager getCameraManager() {
-	return cameraManager;
-    }
-    
-    public List<String> filterNames(final String base) {
-	criteria.setBase(base);
-	return cameraManager.getCameraNames().stream().filter(criteria).collect(Collectors.toList());
-    }
-
-    private class FilteringCriteria implements Predicate<String> {
-
-	private String base = "";
-	public void setBase(final String base) {
-	    this.base = base.toLowerCase();
+		new UseCameraCommand(this, getCommand("usecamera"));
+		new SetCameraCommand(this, getCommand("setcamera"));
+		new DestroyCameraCommand(this, getCommand("deletecamera"));
 	}
 
 	@Override
-	public boolean test(final String other) {
-	    return other.toLowerCase().startsWith(base);
+	public void onDisable() {
+		getLogger().info(ChatColor.GREEN + "Security Cams API is Shutting Down");
 	}
-	
-    }
+
+	public CameraManager getCameraManager() {
+		return cameraManager;
+	}
+
+	public List<String> filterNames(final String base) {
+		criteria.setBase(base);
+		return cameraManager.getCameraNames().stream().filter(criteria).collect(Collectors.toList());
+	}
+
+	private static class FilteringCriteria implements Predicate<String> {
+
+		private String base = "";
+		public void setBase(final String base) {
+			this.base = base.toLowerCase();
+		}
+
+		@Override
+		public boolean test(final String other) {
+			return other.toLowerCase().startsWith(base);
+		}
+	}
 }

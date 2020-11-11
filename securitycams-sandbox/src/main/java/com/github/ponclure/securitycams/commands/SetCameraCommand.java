@@ -36,58 +36,60 @@ import static java.lang.Float.parseFloat;
 
 public class SetCameraCommand implements TabExecutor {
 
-    private final CameraManager cameraManager;
+	private final CameraManager cameraManager;
 
-    public SetCameraCommand(final CamerasSandbox plugin, final PluginCommand command) {
-	if (command == null) {
-	    throw new RuntimeException();
-	}
-	command.setExecutor(this);
-	this.cameraManager = plugin.getCameraManager();
-    }
-
-    @Override
-    public boolean onCommand(@NotNull final CommandSender sender, @NotNull final Command command,
-	    @NotNull final String label, @NotNull final String[] args) {
-	if (!(sender instanceof Player)) {
-	    sender.sendMessage("Only players can run this command!");
-	    return true;
-	}
-	if (!sender.isOp()) { // perms check go brrrrrrrrr
-	    sender.sendMessage("You do not have sufficient permissions!");
-	    return true;
-	}
-	
-	final Player player = (Player) sender;
-	final Location location;
-	
-	switch (args.length) {
-	case 1:
-	    location = player.getLocation();
-	    break;
-
-	case 4:
-	    location = new Location(player.getWorld(), parseDouble(args[1]), parseDouble(args[2]),
-		    parseDouble(args[3]));
-	    break;
-
-	case 6:
-	    location = new Location(player.getWorld(), parseDouble(args[1]), parseDouble(args[2]), parseDouble(args[3]),
-		    parseFloat(args[4]), parseFloat(args[5]));
-	    break;
-
-	default:
-	    player.sendMessage("Usage: /setcamera <name> [<x> <y> <z> [<yaw> <pitch>]]");
-	    return false;
+	public SetCameraCommand(final CamerasSandbox plugin, final PluginCommand command) {
+		if (command == null) {
+			throw new RuntimeException();
+		}
+		command.setExecutor(this);
+		this.cameraManager = plugin.getCameraManager();
 	}
 
-	cameraManager.addCamera(location, args[0]);
-	return true;
-    }
+	@Override
+	public boolean onCommand(@NotNull final CommandSender sender, @NotNull final Command command, @NotNull final String label, @NotNull final String[] args) {
+		if (!(sender instanceof Player)) {
+			sender.sendMessage("Only players can run this command!");
+			return true;
+		}
 
-    @Override
-    public @NotNull List<String> onTabComplete(@NotNull final CommandSender sender, @NotNull final Command command,
-	    @NotNull final String alias, @NotNull final String[] args) {
-	return Collections.emptyList();
-    }
+		if (!sender.isOp()) { // perms check go brrrrrrrrr
+			sender.sendMessage("You do not have sufficient permissions!");
+			return true;
+		}
+
+		final Player player = (Player)sender;
+		final Location location;
+
+		try {
+			switch (args.length) {
+				case 1:
+					location = player.getLocation();
+					break;
+
+				case 4:
+					location = new Location(player.getWorld(), parseDouble(args[1]), parseDouble(args[2]), parseDouble(args[3]));
+					break;
+
+				case 6:
+					location = new Location(player.getWorld(), parseDouble(args[1]), parseDouble(args[2]), parseDouble(args[3]), parseFloat(args[4]), parseFloat(args[5]));
+					break;
+
+				default:
+					throw new NumberFormatException();
+			}
+
+			cameraManager.addCamera(location, args[0]);
+		}
+		catch (NumberFormatException ex) {
+			player.sendMessage("Usage: /setcamera <name> [<x> <y> <z> [<yaw> <pitch>]]");
+		}
+
+		return true;
+	}
+
+	@Override
+	public @NotNull List<String> onTabComplete(@NotNull final CommandSender sender, @NotNull final Command command, @NotNull final String alias, @NotNull final String[] args) {
+		return Collections.emptyList();
+	}
 }

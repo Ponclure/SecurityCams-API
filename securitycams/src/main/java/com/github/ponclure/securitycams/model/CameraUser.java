@@ -22,7 +22,6 @@ import com.github.ponclure.simplenpcframework.SimpleNPCFramework;
 import com.github.ponclure.simplenpcframework.api.NPC;
 import com.github.ponclure.simplenpcframework.api.skin.AsyncSkinFetcher;
 import com.github.ponclure.simplenpcframework.api.state.NPCSlot;
-import com.github.ponclure.simplenpcframework.internal.NPCBase;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -35,7 +34,7 @@ import java.util.Collections;
 
 public class CameraUser {
 
-	private NPCBase npc;
+	private NPC npc;
 	private final Player player;
 	private final Camera camera;
 	private final Location previousLocation;
@@ -56,7 +55,7 @@ public class CameraUser {
 	private void replacePlayer(final Player player, final Location oldLocation, final SimpleNPCFramework npcFramework) {
 		final PlayerInventory inv = player.getInventory();
 
-		npc = (NPCBase)npcFramework.createNPC(Collections.singletonList(player.getName()));
+		npc = npcFramework.createNPC(Collections.singletonList(player.getName()));
 		npc.setItem(NPCSlot.HELMET, inv.getHelmet());
 		npc.setItem(NPCSlot.CHESTPLATE, inv.getChestplate());
 		npc.setItem(NPCSlot.LEGGINGS, inv.getLeggings());

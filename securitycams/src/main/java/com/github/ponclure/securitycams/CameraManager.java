@@ -49,17 +49,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 public final class CameraManager {
 
 	private final Plugin plugin;
 	private final SimpleNPCFramework npcFramework;
 
-	private File knownCamerasFile;
-	public final Executor async = ForkJoinPool.commonPool();
+	private final File knownCamerasFile;
+	private final Executor async = ForkJoinPool.commonPool();
 	private final YamlConfiguration knownCamerasYaml = new YamlConfiguration();
+	private final ReentrantReadWriteLock.WriteLock writeLock = new ReentrantReadWriteLock().writeLock();
 
 	private final Set<UUID> knownCameras = new LinkedHashSet<>();
 	private final Map<String, Camera> cameras = new LinkedHashMap<>();
@@ -79,60 +78,41 @@ public final class CameraManager {
 		new PlayerConserver(plugin, this);
 	}
 
-	// TODO: load/save armor stands UUIDs and their locations into the index file,
-	// that would be done asynchronously with a lock.
-	// load would cache on camera manager creation, save would trigger on each
-	// camera addition/deletion.
-
-	// TODO: Create load
-
-	private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-	private final WriteLock writeLock = lock.writeLock();
-
 	private void addCameraYAML(Camera added) {
 		String uuid = added.getUUID().toString();
-		CompletableFuture.runAsync(() -> {
-			try {
-				writeLock.lock();
-				knownCamerasYaml.createSection(uuid);
-				knownCamerasYaml.set(uuid + ".name", added.getName());
-				knownCamerasYaml.set(uuid + ".location", added.getActualLocation());
-				saveConfiguration();
-			} finally {
-				writeLock.unlock();
-			}
-			return;
-		}, async);
+		knownCamerasYaml.createSection(uuid);
+		knownCamerasYaml.set(uuid + ".name", added.getName());
+		knownCamerasYaml.set(uuid + ".location", added.getActualLocation());
+		saveConfiguration();
 	}
 
 	private void removeCameraYAML(Camera deleted) {
 		String uuid = deleted.getUUID().toString();
-		CompletableFuture.runAsync(() -> {
-			try {
-				writeLock.lock();
-				knownCamerasYaml.set(uuid, null);
-				saveConfiguration();
-			} finally {
-				writeLock.unlock();
-			}
-			return;
-		}, async);
+		knownCamerasYaml.set(uuid, null);
+		saveConfiguration();
 	}
 
 	public void saveConfiguration() {
-		try {
-			knownCamerasYaml.save(knownCamerasFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		CompletableFuture.runAsync(() -> {
+			try {
+				writeLock.lock();
+				knownCamerasYaml.save(knownCamerasFile);
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+			finally {
+				writeLock.unlock();
+			}
+		}, async);
 	}
 
 	private void loadCameras() {
-		for (String identifier : knownCamerasYaml.getKeys(false)) {
-			ConfigurationSection section = knownCamerasYaml.getConfigurationSection(identifier);
-			String name = section.getString("name");
-			Location location = section.getLocation("location");
-			UUID uuid = UUID.fromString(identifier);
+		for (final String identifier : knownCamerasYaml.getKeys(false)) {
+			final ConfigurationSection section = knownCamerasYaml.getConfigurationSection(identifier);
+			final String name = section.getString("name");
+			final Location location = section.getLocation("location");
+			final UUID uuid = UUID.fromString(identifier);
 			knownCameras.add(uuid);
 			cameras.put(name, Camera.createVirtual(location, name, uuid));
 		}

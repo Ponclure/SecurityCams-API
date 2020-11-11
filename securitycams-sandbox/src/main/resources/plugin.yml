@@ -3,7 +3,7 @@ main: com.github.ponclure.securitycams.CamerasSandbox
 version: ${project.version}
 description: Security Cams in Minecraft
 author: Ponclure
-api-version: 1.16
+api-version: 1.15
 
 commands:
   setcamera:
