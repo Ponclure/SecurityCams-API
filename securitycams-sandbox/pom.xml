@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.github.ponclure</groupId>
 		<artifactId>securitycams-parent</artifactId>
-		<version>RELEASE-1.0.0</version>
+		<version>RELEASE-1.0.1</version>
 	</parent>
 
 	<artifactId>securitycams-sandbox</artifactId>
@@ -64,7 +64,7 @@
 		<dependency>
 			<groupId>com.github.ponclure</groupId>
 			<artifactId>securitycams</artifactId>
-			<version>RELEASE-1.0.0</version>
+			<version>${project.parent.version}</version>
 			<scope>compile</scope>
 		</dependency>
 
