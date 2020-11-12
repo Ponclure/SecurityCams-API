@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Security Cameras API is one of the **best** Security Camera API you will get, featuring many options for developers who like coding around security cameras. Features include a well formatted readable code friendly for developers to work around, an active Github which has commits often being pushed, and a discord for support if you require assistance. The code is open source and can be located [here](https://github.com/Ponclure/SecurityCams-API), which contains both the API and the example plugin we have provided to point users to the right direction. To use the API, download the jar provided in the Spigot resource and shade it inside your plugin. 
+Security Cameras API is one of the **best** Security Camera API you will get, featuring many options for developers who like coding around security cameras. Features include a well formatted readable code friendly for developers to work around, an active Github which has commits often being pushed, and a discord for support if you require assistance. The code is open source and can be located [here](https://github.com/Ponclure/SecurityCams-API), which contains both the API and the example plugin we have provided to point users to the right direction. To use the API, download the jar provided in the Spigot resource and shade it inside your plugin. ***Do not `minimizeJar` or anything of the like, as it loads some version-specific classes dynamically with Reflection.*** 
 
 What do Security Cameras look like: Security Cameras API relies on the idea of using Armorstands which are invisible and have a "Camera" as its head.
 
