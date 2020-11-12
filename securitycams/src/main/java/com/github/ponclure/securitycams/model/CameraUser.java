@@ -31,6 +31,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
 
 public class CameraUser {
 
@@ -72,9 +73,9 @@ public class CameraUser {
 		});
 	}
 
-	public void returnBack() {
+	public CompletableFuture<Void> returnBack() {
 		npc.destroy();
-		PaperLib.teleportAsync(player, previousLocation, PlayerTeleportEvent.TeleportCause.PLUGIN).thenRun(() -> {
+		return PaperLib.teleportAsync(player, previousLocation, PlayerTeleportEvent.TeleportCause.PLUGIN).thenRun(() -> {
 			player.setGameMode(previousGamemode);
 		});
 	}

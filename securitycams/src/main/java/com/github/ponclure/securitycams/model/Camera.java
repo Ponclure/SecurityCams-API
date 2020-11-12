@@ -22,9 +22,12 @@ import com.github.ponclure.securitycams.util.SkullCreation;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
@@ -36,16 +39,17 @@ public class Camera {
 
 	private static final ItemStack CAMERA_HEAD = SkullCreation.itemWithBase64(SkullCreation.createSkull(), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2RiODM1ODY1NDI5MzRmOGMzMjMxYTUyODRmMjQ4OWI4NzY3ODQ3ODQ1NGZjYTY5MzU5NDQ3NTY5ZjE1N2QxNCJ9fX0=");
 	private static final Vector TWO = new Vector(2, 2, 2);
+	private static final Byte DUMMY = 1;
 
-	public static Camera create(final Location location, final String name) {
-		return new Camera(location, name, getStandModel(location).getUniqueId());
+	public static Camera create(final Location location, final String name, final NamespacedKey isCameraKey) {
+		return new Camera(location, name, getStandModel(location, isCameraKey).getUniqueId());
 	}
 
 	public static Camera createVirtual(final Location location, final String name, final UUID uuid) {
 		return new Camera(location, name, uuid);
 	}
 
-	private static ArmorStand getStandModel(final Location location) {
+	private static ArmorStand getStandModel(final Location location, final NamespacedKey isCameraKey) {
 		return location.getWorld().spawn(location, ArmorStand.class, armorStand -> {
 			armorStand.setGravity(false);
 			armorStand.setArms(false);
@@ -69,6 +73,9 @@ public class Camera {
 					armorStand.addEquipmentLock(equipmentSlot, lockType);
 				}
 			}
+
+			final PersistentDataContainer pdc = armorStand.getPersistentDataContainer();
+			pdc.set(isCameraKey, PersistentDataType.BYTE, DUMMY);
 		});
 	}
 
