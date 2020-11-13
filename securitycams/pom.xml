@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.github.ponclure</groupId>
 		<artifactId>securitycams-parent</artifactId>
-		<version>RELEASE-1.0.0</version>
+		<version>RELEASE-1.0.1</version>
 	</parent>
 	<artifactId>securitycams</artifactId>
 	<packaging>jar</packaging>
@@ -35,7 +35,6 @@
 						</goals>
 						<configuration>
 							<createDependencyReducedPom>false</createDependencyReducedPom>
-							<minimizeJar>true</minimizeJar>
 							<relocations>
 								<relocation>
 									<pattern>io.papermc.lib</pattern>

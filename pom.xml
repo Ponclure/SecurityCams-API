@@ -6,7 +6,7 @@
 
 	<groupId>com.github.ponclure</groupId>
 	<artifactId>securitycams-parent</artifactId>
-	<version>RELEASE-1.0.0</version>
+	<version>RELEASE-1.0.1</version>
 	<modules>
 		<module>securitycams</module>
 		<module>securitycams-sandbox</module>
