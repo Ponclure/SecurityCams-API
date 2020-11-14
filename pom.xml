@@ -16,4 +16,20 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	
+	<dependencies>
+	
+	</dependencies>
+		<dependency>
+	    		<groupId>com.github.Ponclure</groupId>
+	    		<artifactId>Simple-NPC-Framework</artifactId>
+	    		<version>2.11-SNAPSHOT</version>
+		</dependency>
+	<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+	
 </project>
