@@ -42,9 +42,10 @@ public class CamerasSandbox extends JavaPlugin {
 
 		try {
 			cameraManager = new CameraManager(this, new File(getDataFolder(), "cameras.yml"));
-		}
-		catch (IOException | InvalidConfigurationException e) {
-			throw new RuntimeException(e);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InvalidConfigurationException e) {
+			e.printStackTrace();
 		}
 
 		new UseCameraCommand(this, getCommand("usecamera"));

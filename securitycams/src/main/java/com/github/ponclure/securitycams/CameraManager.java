@@ -55,176 +55,170 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public final class CameraManager {
 
-	private final Plugin plugin;
-	private final SimpleNPCFramework npcFramework;
+    private final Plugin plugin;
+    private final SimpleNPCFramework npcFramework;
 
-	private final File knownCamerasFile;
-	private final Executor async = ForkJoinPool.commonPool();
-	private final YamlConfiguration knownCamerasYaml = new YamlConfiguration();
-	private final ReentrantReadWriteLock.WriteLock writeLock = new ReentrantReadWriteLock().writeLock();
+    private final File knownCamerasFile;
+    private final Executor async = ForkJoinPool.commonPool();
+    private final YamlConfiguration knownCamerasYaml = new YamlConfiguration();
+    private final ReentrantReadWriteLock.WriteLock writeLock = new ReentrantReadWriteLock().writeLock();
 
-	private final NamespacedKey isCameraKey;
-	private final Map<String, Camera> cameras = new LinkedHashMap<>();
-	private final Map<UUID, CameraUser> watchers = new LinkedHashMap<>();
+    private final NamespacedKey isCameraKey;
+    private final Map<String, Camera> cameras = new LinkedHashMap<>();
+    private final Map<UUID, CameraUser> watchers = new LinkedHashMap<>();
 
-	public CameraManager(final JavaPlugin plugin, final File index) {
-		this.plugin = plugin;
-		this.npcFramework = new SimpleNPCFramework(plugin);
-		this.isCameraKey = new NamespacedKey(plugin, "security-camera");
+    public CameraManager(final JavaPlugin plugin, final File index) throws IOException, InvalidConfigurationException {
+        this.plugin = plugin;
+        this.npcFramework = new SimpleNPCFramework(plugin);
+        this.isCameraKey = new NamespacedKey(plugin, "security-camera");
 
-		index.getParentFile().mkdirs();
-		try {
-			index.createNewFile();
-			this.knownCamerasYaml.load(index);
-		} catch (IOException | InvalidConfigurationException e) {
-			e.printStackTrace();
-		}
-		this.knownCamerasFile = index;
-		loadCameras();
+        index.getParentFile().mkdirs();
+        index.createNewFile();
+        this.knownCamerasYaml.load(index);
+        this.knownCamerasFile = index;
+        loadCameras();
 
-		new CameraMovement(plugin, this);
-		new PlayerConserver(plugin, this);
-		new PluginDisableListener(plugin, this::shutdown);
-	}
+        new CameraMovement(plugin, this);
+        new PlayerConserver(plugin, this);
+        new PluginDisableListener(plugin, this::shutdown);
+    }
 
-	public void addWatcher(final Player player, final Camera camera) {
-		if (watchers.containsKey(player.getUniqueId())) {
-			return;
-		}
+    public void addWatcher(final Player player, final Camera camera) {
+        if (watchers.containsKey(player.getUniqueId())) {
+            return;
+        }
 
-		final CameraEnterEvent event = new CameraEnterEvent(player, camera);
-		Bukkit.getPluginManager().callEvent(event);
-		if (!event.isCancelled()) {
-			final CameraUser user = new CameraUser(player, camera, npcFramework);
-			watchers.put(player.getUniqueId(), user);
-		}
-	}
+        final CameraEnterEvent event = new CameraEnterEvent(player, camera);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled()) {
+            final CameraUser user = new CameraUser(player, camera, npcFramework);
+            watchers.put(player.getUniqueId(), user);
+        }
+    }
 
-	public CameraUser getWatcher(final Player player) {
-		return watchers.get(player.getUniqueId());
-	}
+    public CameraUser getWatcher(final Player player) {
+        return watchers.get(player.getUniqueId());
+    }
 
-	public boolean isWatching(final Player player) {
-		return watchers.containsKey(player.getUniqueId());
-	}
+    public boolean isWatching(final Player player) {
+        return watchers.containsKey(player.getUniqueId());
+    }
 
-	public boolean removeWatcher(final Player player, final boolean force) {
-		final CameraUser user = watchers.get(player.getUniqueId());
-		if (user == null) {
-			return false;
-		}
+    public boolean removeWatcher(final Player player, final boolean force) {
+        final CameraUser user = watchers.get(player.getUniqueId());
+        if (user == null) {
+            return false;
+        }
 
-		final CameraExitEvent event = new CameraExitEvent(player, user);
-		Bukkit.getPluginManager().callEvent(event);
-		if (!event.isCancelled() || force) {
-			user.returnBack();
-			watchers.remove(player.getUniqueId());
-		}
-		return !event.isCancelled();
-	}
+        final CameraExitEvent event = new CameraExitEvent(player, user);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled() || force) {
+            user.returnBack();
+            watchers.remove(player.getUniqueId());
+        }
+        return !event.isCancelled();
+    }
 
-	public Set<String> getCameraNames() {
-		return Collections.unmodifiableSet(cameras.keySet());
-	}
+    public Set<String> getCameraNames() {
+        return Collections.unmodifiableSet(cameras.keySet());
+    }
 
-	public Camera getCamera(final String name) {
-		return cameras.get(name.toLowerCase());
-	}
+    public Camera getCamera(final String name) {
+        return cameras.get(name.toLowerCase());
+    }
 
-	public boolean isCamera(final Entity entity) {
-		final PersistentDataContainer pdc = entity.getPersistentDataContainer();
-		return pdc.has(isCameraKey, PersistentDataType.BYTE);
-	}
+    public boolean isCamera(final Entity entity) {
+        final PersistentDataContainer pdc = entity.getPersistentDataContainer();
+        return pdc.has(isCameraKey, PersistentDataType.BYTE);
+    }
 
-	public Camera addCamera(final Location location, final String name) {
-		if (cameras.containsKey(name.toLowerCase())) {
-			return cameras.get(name.toLowerCase());
-		}
+    public Camera addCamera(final Location location, final String name) {
+        if (cameras.containsKey(name.toLowerCase())) {
+            return cameras.get(name.toLowerCase());
+        }
 
-		final CameraSetEvent event = new CameraSetEvent(name, location);
-		Bukkit.getPluginManager().callEvent(event);
-		if (!event.isCancelled()) {
-			final Camera camera = Camera.create(location, name, isCameraKey);
-			cameras.put(name.toLowerCase(), camera);
-			addCameraYAML(camera);
-			return camera;
-		}
-		return null;
-	}
+        final CameraSetEvent event = new CameraSetEvent(name, location);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled()) {
+            final Camera camera = Camera.create(location, name, isCameraKey);
+            cameras.put(name.toLowerCase(), camera);
+            addCameraYAML(camera);
+            return camera;
+        }
+        return null;
+    }
 
-	public boolean removeCamera(final String name) {
-		final Camera camera = cameras.get(name.toLowerCase());
-		if (camera == null) {
-			return false;
-		}
+    public boolean removeCamera(final String name) {
+        final Camera camera = cameras.get(name.toLowerCase());
+        if (camera == null) {
+            return false;
+        }
 
-		final CameraDestroyEvent event = new CameraDestroyEvent(camera);
-		Bukkit.getPluginManager().callEvent(event);
-		if (!event.isCancelled()) {
-			camera.destroy();
-			cameras.remove(name.toLowerCase());
-			removeCameraYAML(camera);
-		}
-		return !event.isCancelled();
-	}
+        final CameraDestroyEvent event = new CameraDestroyEvent(camera);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled()) {
+            camera.destroy();
+            cameras.remove(name.toLowerCase());
+            removeCameraYAML(camera);
+        }
+        return !event.isCancelled();
+    }
 
-	public File getKnownCamerasFile() {
-		return knownCamerasFile;
-	}
+    public File getKnownCamerasFile() {
+        return knownCamerasFile;
+    }
 
-	public YamlConfiguration getConfiguration() {
-		return knownCamerasYaml;
-	}
+    public YamlConfiguration getConfiguration() {
+        return knownCamerasYaml;
+    }
 
-	public Plugin getPlugin() {
-		return plugin;
-	}
+    public Plugin getPlugin() {
+        return plugin;
+    }
 
-	private void addCameraYAML(final Camera added) {
-		saveConfiguration(() -> {
-			final String uuid = added.getUUID().toString();
-			knownCamerasYaml.createSection(uuid);
-			knownCamerasYaml.set(uuid + ".name", added.getName());
-			knownCamerasYaml.set(uuid + ".location", added.getActualLocation());
-		});
-	}
+    private void addCameraYAML(final Camera added) {
+        saveConfiguration(() -> {
+            final String uuid = added.getUUID().toString();
+            knownCamerasYaml.createSection(uuid);
+            knownCamerasYaml.set(uuid + ".name", added.getName());
+            knownCamerasYaml.set(uuid + ".location", added.getActualLocation());
+        });
+    }
 
-	private void removeCameraYAML(final Camera deleted) {
-		saveConfiguration(() -> {
-			final String uuid = deleted.getUUID().toString();
-			knownCamerasYaml.set(uuid, null);
-		});
-	}
+    private void removeCameraYAML(final Camera deleted) {
+        saveConfiguration(() -> {
+            final String uuid = deleted.getUUID().toString();
+            knownCamerasYaml.set(uuid, null);
+        });
+    }
 
-	private void saveConfiguration(final Runnable task) {
-		CompletableFuture.runAsync(() -> {
-			try {
-				writeLock.lock();
-				task.run();
-				knownCamerasYaml.save(knownCamerasFile);
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-			finally {
-				writeLock.unlock();
-			}
-		}, async);
-	}
+    private void saveConfiguration(final Runnable task) {
+        CompletableFuture.runAsync(() -> {
+            try {
+                writeLock.lock();
+                task.run();
+                knownCamerasYaml.save(knownCamerasFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                writeLock.unlock();
+            }
+        }, async);
+    }
 
-	private void loadCameras() {
-		for (final String identifier : knownCamerasYaml.getKeys(false)) {
-			final ConfigurationSection section = knownCamerasYaml.getConfigurationSection(identifier);
-			final String name = section.getString("name");
-			final Location location = section.getLocation("location");
-			final UUID uuid = UUID.fromString(identifier);
-			cameras.put(name, Camera.createVirtual(location, name, uuid));
-		}
-	}
+    private void loadCameras() {
+        for (final String identifier : knownCamerasYaml.getKeys(false)) {
+            final ConfigurationSection section = knownCamerasYaml.getConfigurationSection(identifier);
+            final String name = section.getString("name");
+            final Location location = section.getLocation("location");
+            final UUID uuid = UUID.fromString(identifier);
+            cameras.put(name, Camera.createVirtual(location, name, uuid));
+        }
+    }
 
-	private void shutdown() {
-		// make sure to take everyone back and wait for them to be back
-		watchers.values().stream().map(CameraUser::returnBack).forEach(CompletableFuture::join);
-		watchers.clear();
-	}
+    private void shutdown() {
+        // make sure to take everyone back and wait for them to be back
+        watchers.values().stream().map(CameraUser::returnBack).forEach(CompletableFuture::join);
+        watchers.clear();
+    }
 }
