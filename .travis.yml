@@ -1,0 +1,14 @@
+dist: xenial
+os: linux
+language: java
+jdk:
+  - openjdk8
+cache:
+  directories:
+    - $HOME/.m2/
+install:
+  - wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
+  - ls $HOME/.m2/repository/org/spigotmc/spigot/1.15.2-R0.1-SNAPSHOT >> /dev/null 2>&1 || java -jar BuildTools.jar --rev 1.15.2 >> /dev/null 2>&1
+  - ls $HOME/.m2/repository/org/spigotmc/spigot/1.16.4-R0.1-SNAPSHOT >> /dev/null 2>&1 || java -jar BuildTools.jar --rev 1.16.4 >> /dev/null 2>&1
+script:
+  - mvn clean install
