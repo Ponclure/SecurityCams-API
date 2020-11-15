@@ -1,4 +1,10 @@
 # Security Cameras API [1.15 - 1.16] [Friendly Camera API for Developers]
+[![Build Status](https://travis-ci.org/Ponclure/SecurityCams-API.svg?branch=master)](https://travis-ci.org/Ponclure/SecurityCams-API)
+[![Issues](https://img.shields.io/github/issues/Ponclure/SecurityCams-API)](https://github.com/Ponclure/SecurityCams-API/issues)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Discord](https://img.shields.io/discord/775376080546693120.svg?label=discord&logo=discord)](https://discord.gg/d7qfcUwhex)
+[![Repository Size](https://img.shields.io/github/languages/code-size/Ponclure/SecurityCams-API)](https://github.com/Ponclure/SecurityCams-API)
+[![Lines of Code](https://img.shields.io/tokei/lines/github/Ponclure/SecurityCams-API)](https://github.com/Ponclure/SecurityCams-API)
 
 ## Introduction
 
