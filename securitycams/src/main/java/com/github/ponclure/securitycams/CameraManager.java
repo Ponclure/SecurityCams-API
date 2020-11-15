@@ -67,15 +67,19 @@ public final class CameraManager {
 	private final Map<String, Camera> cameras = new LinkedHashMap<>();
 	private final Map<UUID, CameraUser> watchers = new LinkedHashMap<>();
 
-	public CameraManager(final JavaPlugin plugin, final File index) throws InvalidConfigurationException, IOException {
+	public CameraManager(final JavaPlugin plugin, final File index) {
 		this.plugin = plugin;
 		this.npcFramework = new SimpleNPCFramework(plugin);
 		this.isCameraKey = new NamespacedKey(plugin, "security-camera");
 
 		index.getParentFile().mkdirs();
-		index.createNewFile();
+		try {
+			index.createNewFile();
+			this.knownCamerasYaml.load(index);
+		} catch (IOException | InvalidConfigurationException e) {
+			e.printStackTrace();
+		}
 		this.knownCamerasFile = index;
-		this.knownCamerasYaml.load(index);
 		loadCameras();
 
 		new CameraMovement(plugin, this);
