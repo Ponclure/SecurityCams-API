@@ -1,0 +1,17 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+}
+
+dependencies {
+    implementation project(':securitycams')
+    compileOnly 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
+    compileOnly 'org.jetbrains:annotations:20.1.0'
+}
+
+shadowJar {
+    archiveFileName = "securitycams-sandbox-${project.version}.jar"
+}
+
+artifacts {
+    archives shadowJar
+}
