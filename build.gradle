@@ -23,7 +23,7 @@ subprojects {
         }
         
         maven {
-            url = uri('https://jitpack.io')
+            url "http://jitpack.io"
         }
 
         mavenLocal()
