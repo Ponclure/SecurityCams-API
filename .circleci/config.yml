@@ -5,7 +5,7 @@ jobs:
       - image: circleci/openjdk:8-jdk
     working_directory: ~/repo
     environment:
-      MAVEN_OPTS: -Xmx3200m -Xms1600m
+      MAVEN_OPTS: -Xmx3200m -Xms2000m
     steps:
       - checkout
       - run: wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
