@@ -12,9 +12,9 @@ jobs:
       - run: ls ~/.m2/repository/org/spigotmc/spigot/1.15.2-R0.1-SNAPSHOT >> /dev/null 2>&1 || java -jar BuildTools.jar --rev 1.15.2 >> /dev/null 2>&1
       - run: ls ~/.m2/repository/org/spigotmc/spigot/1.16.4-R0.1-SNAPSHOT >> /dev/null 2>&1 || java -jar BuildTools.jar --rev 1.16.4 >> /dev/null 2>&1
       - run: git clone https://github.com/Ponclure/Simple-NPC-Framework.git simplenpcframework
-      - run: cd simplenpcframework
+      - run: cd ./simplenpcframework
       - run: gradle
       - run: cd ..
-      - run: ./gradlew
+      - run: gradle
       - store_artifacts:
           path: target/securitycams-RELEASE-1.0.1-jar-with-dependencies.jar
