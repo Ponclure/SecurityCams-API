@@ -38,4 +38,9 @@ subprojects {
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
     }
+    
+    jar {
+        archiveBaseName = 'SecurityCams-API-LATEST'
+    }
+    
 }
