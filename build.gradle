@@ -6,9 +6,11 @@ allprojects {
 }
 
 subprojects {
+
     apply plugin: 'java'
     apply plugin: 'maven-publish'
-
+    apply plugin: 'com.github.johnrengelman.shadow'
+    
     repositories {
         maven {
             url = 'https://repo.maven.apache.org/maven2'
@@ -39,4 +41,17 @@ subprojects {
         options.encoding = 'UTF-8'
     }
     
+}
+
+dependencies {
+    implementation 'com.github.ponclure:SimpleNPCFramework-API:2.11-SNAPSHOT'
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
+    }
 }
