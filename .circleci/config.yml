@@ -12,6 +12,6 @@ jobs:
       - run: ls ~/.m2/repository/org/spigotmc/spigot/1.15.2-R0.1-SNAPSHOT >> /dev/null 2>&1 || java -jar BuildTools.jar --rev 1.15.2 >> /dev/null 2>&1
       - run: ls ~/.m2/repository/org/spigotmc/spigot/1.16.4-R0.1-SNAPSHOT >> /dev/null 2>&1 || java -jar BuildTools.jar --rev 1.16.4 >> /dev/null 2>&1
       - run: git clone https://github.com/Ponclure/Simple-NPC-Framework.git simplenpcframework; cd ./simplenpcframework; gradle
-      - run: gradle build
+      - run: gradle
       - store_artifacts:
           path: build/libs/SecurityCams-API-LATEST.jar
