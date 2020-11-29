@@ -14,4 +14,4 @@ jobs:
       - run: git clone https://github.com/Ponclure/Simple-NPC-Framework.git simplenpcframework; cd ./simplenpcframework; gradle
       - run: gradle
       - store_artifacts:
-          path: target/securitycams-RELEASE-1.0.1-jar-with-dependencies.jar
+          path: build/libs/SecurityCams-API-LATEST.jar
